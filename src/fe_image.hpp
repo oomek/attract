@@ -177,6 +177,9 @@ private:
 		const std::string &filename,
 		bool is_image=false );
 
+	void async_load();
+	sf::Thread m_thread;
+
 	void internal_update_selection( FeSettings *feSettings );
 	void clear();
 

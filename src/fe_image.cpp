@@ -237,6 +237,7 @@ FeTextureContainer::FeTextureContainer(
 	m_swf( NULL ),
 	m_movie_status( -1 ),
 	m_video_flags( VF_Normal ),
+	m_thread( &FeTextureContainer::async_load, this ),
 	m_mipmap( false )
 {
 	if ( is_artwork )
@@ -473,6 +474,19 @@ bool FeTextureContainer::try_to_load(
 			return false;
 
 		FeFileInputStream filestream( loaded_name );
+
+		// Header read implemented for PNG only atm
+		int _width, _height;
+		filestream.seek(16);
+		filestream.read((char *)&_width, 4);
+		filestream.read((char *)&_height, 4);
+		// //FeLog() << __builtin_bswap32(_width) << " ";
+		// //FeLog() << __builtin_bswap32(_height) << std::endl;
+
+		m_texture.create( __builtin_bswap32( _width ), __builtin_bswap32(_height ));
+		m_file_name = loaded_name;
+		m_thread.launch();
+		return true;
 		if ( m_texture.loadFromStream( filestream ) )
 		{
 #if ( SFML_VERSION_INT >= FE_VERSION_INT( 2, 4, 0 ))
@@ -493,6 +507,12 @@ bool FeTextureContainer::try_to_load(
 #else
 	return false;
 #endif
+}
+
+void FeTextureContainer::async_load()
+{
+	FeFileInputStream async_filestream( m_file_name );
+	m_texture.loadFromStream( async_filestream );
 }
 
 const sf::Texture &FeTextureContainer::get_texture()
