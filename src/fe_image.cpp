@@ -291,11 +291,13 @@ bool FeTextureContainer::load_with_ffmpeg(
 		if ( !file_exists( path ) )
 		{
 			m_texture = sf::Texture();
+			m_texture_new = sf::Texture();
 			return false;
 		}
 
 		m_movie = new FeMedia( FeMedia::AudioVideo );
-		res = m_movie->open( path, filename, &m_texture );
+		res = m_movie->open( path, filename, &m_texture_new );
+		m_texture.create( m_texture_new.getSize().x, m_texture_new.getSize().y );
 	}
 	else
 	{
@@ -308,11 +310,13 @@ bool FeTextureContainer::load_with_ffmpeg(
 		if ( !file_exists( loaded_name ) )
 		{
 			m_texture = sf::Texture();
+			m_texture_new = sf::Texture();
 			return false;
 		}
 
 		m_movie = new FeMedia( FeMedia::AudioVideo );
-		res = m_movie->open( "", loaded_name, &m_texture );
+		res = m_movie->open( "", loaded_name, &m_texture_new );
+		m_texture.create( m_texture_new.getSize().x, m_texture_new.getSize().y );
 	}
 
 	if ( !res )
@@ -321,6 +325,7 @@ bool FeTextureContainer::load_with_ffmpeg(
 			<< loaded_name << std::endl;
 
 		m_texture = sf::Texture();
+		m_texture_new = sf::Texture();
 		delete m_movie;
 		m_movie = NULL;
 		return false;
@@ -341,6 +346,7 @@ bool FeTextureContainer::load_with_ffmpeg(
 		m_movie_status = 1; // 1=on track to be played
 
 	m_texture.setSmooth( m_smooth );
+	m_texture_new.setSmooth( m_smooth );
 	m_file_name = loaded_name;
 	return true;
 }
@@ -728,6 +734,8 @@ bool FeTextureContainer::tick( FeSettings *feSettings, bool play_movies )
 
 		if ( m_movie->tick() )
 		{
+			m_texture.swap( m_texture_new );
+			notify_texture_change();
 #if ( SFML_VERSION_INT >= FE_VERSION_INT( 2, 4, 0 ))
 			if ( m_mipmap ) m_texture.generateMipmap();
 #endif
@@ -980,6 +988,10 @@ void FeTextureContainer::set_smooth( bool s )
 		m_swf->set_smooth( s );
 #endif
 	m_texture.setSmooth( s );
+#ifndef NO_MOVIE
+	if ( m_movie )
+		m_texture_new.setSmooth( s );
+#endif
 }
 
 bool FeTextureContainer::get_smooth() const

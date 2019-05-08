@@ -187,6 +187,7 @@ private:
 	void clear();
 
 	sf::Texture m_texture;
+	sf::Texture m_texture_new;
 
 	std::string m_art_name; // artwork label/template name (dynamic images)
 	std::string m_file_name; // the name of the loaded file

@@ -809,7 +809,6 @@ void FeMedia::init_av()
 
 	if ( do_init )
 	{
-		avcodec_register_all();
 		av_register_all();
 		do_init=false;
 	}
@@ -1473,6 +1472,8 @@ void FeMedia::get_decoder_list( std::vector< std::string > &l )
 	//
 	if ( avcodec_find_decoder_by_name( "mpeg4_mmal" ) )
 		l.push_back( "mmal" );
+
+	l.push_back( "openmax" );
 #endif
 
 #if FE_HWACCEL
