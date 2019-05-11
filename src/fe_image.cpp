@@ -298,6 +298,8 @@ bool FeTextureContainer::load_with_ffmpeg(
 		m_movie = new FeMedia( FeMedia::AudioVideo );
 		res = m_movie->open( path, filename, &m_texture_new );
 		m_texture.create( m_texture_new.getSize().x, m_texture_new.getSize().y );
+		m_texture.swap(m_texture_new);
+		notify_texture_change();
 	}
 	else
 	{
@@ -317,6 +319,8 @@ bool FeTextureContainer::load_with_ffmpeg(
 		m_movie = new FeMedia( FeMedia::AudioVideo );
 		res = m_movie->open( "", loaded_name, &m_texture_new );
 		m_texture.create( m_texture_new.getSize().x, m_texture_new.getSize().y );
+		m_texture.swap(m_texture_new);
+		notify_texture_change();
 	}
 
 	if ( !res )
