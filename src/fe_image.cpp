@@ -514,6 +514,7 @@ bool FeTextureContainer::load_to_texture( sf::InputStream &s )
 		return true;
 	}
 
+	m_texture = sf::Texture();
 	return m_texture.loadFromImage( img );
 }
 
