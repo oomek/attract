@@ -602,6 +602,21 @@ int main(int argc, char *argv[])
 						texture.create( window.getSize().x, window.getSize().y );
 						texture.update( window );
 						sf::Image sshot_img = texture.copyToImage();
+#ifdef USE_GLES
+						// On the Raspberry Pi framebuffer is flipped, so we have to unflip it.
+						sshot_img.flipVertically();
+
+						// On the Raspberry Pi screenshot contains alpha values. We need to set it to full opaque.
+						// Maybe there is a way to make it faster.
+        				sf::Color pixel_color;
+        				for (int x = 0; x < sshot_img.getSize().x; x++)
+        					for (int y = 0; y < sshot_img.getSize().y; y++)
+        					{
+ 								pixel_color = sshot_img.getPixel( x, y );
+ 								pixel_color.a = 255;
+        						sshot_img.setPixel( x, y, pixel_color );
+        					}
+#endif
 #else
 						sf::Image sshot_img = window.capture();
 #endif
